@@ -16,9 +16,6 @@ x = tala
 Dæmi 2:
 ```C
 int summa(int n) {
-	int m = 0;
-	if(n == 1)
-		return 1;
-	return (n*n) + summa(n-1);
+	return n == 1 ? 1 : ((n*n) + summa(n-1));
 }
 ```
