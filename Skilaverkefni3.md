@@ -4,6 +4,7 @@
 Fallið:
 ```C
 // Recursive fall til að raða í stafrófsröð!!
+// Aðferðin byggir á bubblesort
 void stafrof(int len, char** strengir) {	
 	if(!len)
 		return;
@@ -27,7 +28,7 @@ stafrof(lengd á lista, listi af strengjum);
 ```
 
 ## Raða strax í lista:
-```
+```C
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -62,5 +63,127 @@ int main(){
 	printf("\n");
 
 	free(listi); // sama og delete í C++, bara delete er ekki til í C
+}
+```
+
+## Röðunaralgrím:
+
+Hér notaðist ég við Bubblesort, og bar saman við qsort (úr stdlib í C) og counting sort (sem ég kóðaði sjálfur), cmpfunc sem þú sérð er fall sem maður þarf út af einhverri ástæðu að skrifa sjálfur fyrir qsort og láta qort svo kalla á það til að bera tölur saman til að raða.
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h> // Fyrir tímamæingar
+
+#define MILLION 1000000
+#define MALLOC 400000 // Það sem við ætlum að taka langan lista
+
+void bubblesort(int size, int* listi) {
+	int count;
+	do {
+		count = 0;
+		for(int i = 1; i < size; i++) {
+			if(listi[i] < listi[i-1]) {
+				int tmp = listi[i];
+				listi[i] = listi[i - 1];
+				listi[i - 1] = tmp;
+				count++;
+			}
+		}
+		size--;
+		
+	} while(count > 1);
+}
+
+int* countingsort(int size, int* listi, int min, int max) {
+	
+	int count[max+1];
+	for(int i = 0; i < max+1; i++)
+		count[i] = 0;
+	for(int i = 0; i < size; i++) {
+		count[listi[i]]++;
+	}
+	for(int i = 1; i < max+1; i++) {
+		count[i] += count[i-1];
+	}
+	
+	int* result = malloc(size*sizeof(int));
+	
+	for(int i = 0; i < size; i++) {
+		
+		int index1 = listi[i];
+		int index2 = count[index1-1]--;
+		
+		//printf("%i, index2: %i\n", i, index2);
+		result[index2] = listi[i];
+	}
+	
+	return result;
+}
+
+
+
+int cmpfunc(const void* a, const void* b) {
+	return (*(int*)a - *(int*)b);
+}
+
+
+int main(){
+
+	int* listi = malloc(MALLOC*sizeof(int));
+
+	for(int i = 0; i < MALLOC; i++) {
+		listi[i] = MALLOC - i;
+		
+	}
+	
+	struct timespec start, end;
+	// BUBBLESORT BEGIN
+	
+	printf("Sorting list...\n");
+	
+	clock_gettime(CLOCK_MONOTONIC, &start);
+	
+	bubblesort(MALLOC, listi);
+	
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	printf("BubbleSorting took %f seconds\n", (double)((((double)((double)end.tv_sec - start.tv_sec) * MILLION) + (((double)end.tv_nsec - (double)start.tv_nsec) / 1000))/MILLION));
+	printf("%i, %i, %i, %i\n", listi[0], listi[MALLOC-1], listi[500], listi[MALLOC/2]);
+	// BUBBLESORT END
+	
+	// C qsort BEGIN (innbyggða sorting fallið í C úr stdlib)
+	int* listi2 = malloc(MALLOC*sizeof(int));
+	for(int i = 0; i < MALLOC; i++) {
+		listi2[i] = MALLOC - i;
+	}
+	
+	clock_gettime(CLOCK_MONOTONIC, &start);
+	
+	qsort(listi2, MALLOC, sizeof(int), cmpfunc);
+	
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	printf("QSorting took %f seconds\n", (double)((((double)((double)end.tv_sec - start.tv_sec) * MILLION) + (((double)end.tv_nsec - (double)start.tv_nsec) / 1000))/MILLION));
+	
+	printf("%i, %i, %i, %i\n", listi2[0], listi2[MALLOC-1], listi2[500], listi2[MALLOC/2]);
+	// C qsort END
+	// COUNTINGSORT BEGIN
+	for(int i = 0; i < MALLOC; i++) {
+		listi2[i] = MALLOC - i;
+	}
+	
+	clock_gettime(CLOCK_MONOTONIC, &start);
+	
+	int* res = countingsort(MALLOC, listi2, 0, MALLOC-1);
+	
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	printf("CountingSorting took %f seconds\n", (double)((((double)((double)end.tv_sec - start.tv_sec) * MILLION) + (((double)end.tv_nsec - (double)start.tv_nsec) / 1000))/MILLION));
+	
+	printf("%i, %i, %i, %i\n", res[0], res[MALLOC-1], res[500], res[MALLOC/2]);
+	// COUNTINGSORT END
+
+	
+	free(listi);
+	free(listi2);
+	
 }
 ```
