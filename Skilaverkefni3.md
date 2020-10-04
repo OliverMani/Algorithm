@@ -3,7 +3,9 @@
 Big O er merkt sem flækjustig á reikniritum, til dæmis fyrir tímamælingar og svona.
 
 a) O(n) er þegar við erum með lista og notum algrím sem þarf að fara í gegnum allan listann einu sinni til að virka
+
 b) O(n^2) kemur þegar við erum til dæmis með lykkju inn í lykkju, BubbleSort er til dæmis með flækjustigið O(n^2) í versta tilfelli
+
 c) O(n\*log(n)) er þegar algríðmið getur sparað sér tíma í að gera það sem það gerir
 
 ## Röðunaralgrím:
