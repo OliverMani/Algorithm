@@ -94,24 +94,18 @@ char delete(struct tree* root, int number) {
 }
 
 void preOrderPrint(struct tree* root) {
-
+	if(!root) return;
+	printf("%i\n", root->number);
+	preOrderPrint(root->left);
+	preOrderPrint(root->right);
+	
 }
 
 void postOrderPrint(struct tree* root) {
-	printf("from %i: ", root->number);
-	if(root->left)
-		printf("%i, ", root->left->number);
-	else
-		printf("(null), ");
-	if(root->right)
-		printf("%i\n", root->right->number);
-	else
-		printf("(null)\n");
-	
-	if(root->left)
-		postOrderPrint(root->left);
-	if(root->right)
-		postOrderPrint(root->right);
+	if(!root) return;
+	preOrderPrint(root->left);
+	preOrderPrint(root->right);
+	printf("%i\n", root->number);
 }
 
 int main(){
@@ -127,5 +121,15 @@ int main(){
 	delete(root, 12);
 	printf("Fann 12: %i\n", find(root, 12) != NULL);
 	printf("\n\n\n");
+	
+	insert(root, 1);
+	insert(root, 6);
+	
+	printf("PreOrderPrint:\n");
+	preOrderPrint(root);
+	printf("postOrderPrint:\n");
+	postOrderPrint(root);
+	delete(root, 6);
+	printf("After delete 6 (Post Order):\n");
 	postOrderPrint(root);
 }
